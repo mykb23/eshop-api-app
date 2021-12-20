@@ -1,0 +1,1411 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "E-Commerce API Documentation",
+        "description": "API support for a E-Commerce",
+        "contact": {
+            "email": "makinsuroju@gmail.com"
+        },
+        "license": {
+            "name": "Apache License 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registration",
+                "operationId": "c8443fb95bbf4a97f23c39cbaf099216",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "firstName",
+                                    "lastName",
+                                    "email",
+                                    "password",
+                                    "telephone"
+                                ],
+                                "properties": {
+                                    "firstName": {
+                                        "title": "firstName",
+                                        "type": "string",
+                                        "default": "John",
+                                        "minLength": 3
+                                    },
+                                    "lastName": {
+                                        "title": "lastName",
+                                        "type": "string",
+                                        "default": "Doe",
+                                        "minLength": 3
+                                    },
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "JohnDoe@mail.com"
+                                    },
+                                    "password": {
+                                        "title": "password",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "title": "password_confirmation",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "telephone": {
+                                        "title": "telephone",
+                                        "type": "telephone",
+                                        "default": "07067980879"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "example": "Created"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Request not processed"
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "operationId": "15400f94bfe16d4952aa545606939fc2",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "john-doe@mail.com"
+                                    },
+                                    "password": {
+                                        "title": "password",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "remember_me": {
+                                        "title": "remember_me",
+                                        "type": "boolean",
+                                        "default": "false"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "access_token": {
+                                            "title": "access_token",
+                                            "type": "string"
+                                        },
+                                        "token_type": {
+                                            "title": "token_type",
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "Invalid Credentials!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Request not processed"
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout",
+                "operationId": "39f13ab593b99e98cae286d8e71e1444",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "example": "Successfully logout"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/signup/activate/{token}": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "activate account",
+                "operationId": "c6bbf91643c10f337156e0d2cddcfbc5",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "404": {
+                        "description": "unsuccessful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "example": "This activation token is invalid"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/activation-token": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Request new activation token",
+                "operationId": "fc871a06c40329dd2b4d5a8000088fc9",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "john-doe@mail.com",
+                                        "example": "john@mail.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "A new verification link has been sent to your email address"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "User not found, please register"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/password-reset/create": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Password reset request",
+                "operationId": "78686995fdaea6c738b91ccb4d84a36e",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "redirect_url"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "john-doe@mail.com"
+                                    },
+                                    "redirect_url": {
+                                        "title": "redirect_url",
+                                        "type": "string",
+                                        "example": "http://example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "We have e-mailed your password reset link!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "We can't find a user with that email address."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/password-reset/{token}": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "description": "Password reset with token",
+                "operationId": "b1f447b4b3567651aae0b4c46a13bd90",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password reset with token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "title": "token",
+                                            "type": "string",
+                                            "example": "cVirkKfR6wg4NPbfjMAdEmzHacztBeP2twIPm6StoTDsvHUWymvcrlJD9cDB"
+                                        },
+                                        "email": {
+                                            "title": "email",
+                                            "type": "email",
+                                            "example": "example@example.com"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Password reset with token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "This password reset token is invalid."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/password-reset/": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change Password",
+                "description": "Reset Password",
+                "operationId": "30af651967c1ed4178a1f9fd41a2cb55",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "token"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "JohnDoe@mail.com"
+                                    },
+                                    "password": {
+                                        "title": "password",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "title": "password_confirmation",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "token": {
+                                        "title": "token",
+                                        "type": "string",
+                                        "example": "cVirkKfR6wg4NPbfjMAdEmzHacztBeP2twIPm6StoTDsvHUWymvcrlJD9cDB"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "We can't find a user with that email address."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Errors"
+                    }
+                }
+            }
+        },
+        "/api/v1/cart": {
+            "get": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Get all products in cart",
+                "description": "Get all products in cart",
+                "operationId": "2721c2a7f5993ff11ef640d1ca9a2c7c",
+                "responses": {
+                    "200": {
+                        "description": "Success operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cart"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Add new item cart",
+                "operationId": "d31e6a9806855ee4121c195b0ceea8dc",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "product_name",
+                                    "product_id",
+                                    "product_price",
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "product_id": {
+                                        "title": "product_id",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "product_name": {
+                                        "title": "product_name",
+                                        "type": "string",
+                                        "example": "Gucci Shirt"
+                                    },
+                                    "product_price": {
+                                        "title": "product_price",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "quantity": {
+                                        "title": "quantity",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "cart": {
+                                            "$ref": "#/components/schemas/Cart"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "number",
+                                            "default": 201
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/cart/update/id": {
+            "patch": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "update quantity in cart",
+                "operationId": "2129e67715666f495206449569d9adcd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "quantity": {
+                                        "title": "quantity",
+                                        "type": "integer",
+                                        "example": "1"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Success operation"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/cart/remove/{id}": {
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "remove an item from cart",
+                "description": "remove an item from cart",
+                "operationId": "5d5ec3bd3c28d14beecff21ee47f96f7",
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/cart/clear": {
+            "delete": {
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Clear all cart items associated with the current user.",
+                "description": "clear all items cart",
+                "operationId": "dbfc2e8c424538ad5364e0ab0246eb0f",
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/product": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Retrieve products",
+                "description": "Get all products",
+                "operationId": "productsList",
+                "responses": {
+                    "200": {
+                        "description": "Success operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "number",
+                                            "default": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Create a new product",
+                "operationId": "f59585f94ec2b5c87347e9ea2c161c11",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "category",
+                                    "image",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "title": "title",
+                                        "type": "string",
+                                        "default": "Black Shirt",
+                                        "minLength": 5
+                                    },
+                                    "price": {
+                                        "title": "price",
+                                        "type": "double",
+                                        "default": "$100.00",
+                                        "minLength": 2
+                                    },
+                                    "description": {
+                                        "title": "description",
+                                        "type": "string",
+                                        "default": "Black Shirt unisex",
+                                        "minLength": 10
+                                    },
+                                    "image": {
+                                        "title": "image",
+                                        "type": "file"
+                                    },
+                                    "featured": {
+                                        "title": "featured",
+                                        "type": "boolean",
+                                        "example": "false"
+                                    },
+                                    "category": {
+                                        "title": "category",
+                                        "type": "string",
+                                        "default": "men's clothing",
+                                        "minLength": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "number",
+                                            "default": 201
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "example": "The Product was successfully created"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/product/{id}": {
+            "get": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Get product detail",
+                "operationId": "4576535dfeb323e297ec83ea67c18fce",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "number",
+                                            "default": 200
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Update product",
+                "operationId": "b4b3845dc758045799715847f7c56325",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "category",
+                                    "price",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "title": "title",
+                                        "type": "string",
+                                        "default": "Black Shirt",
+                                        "minLength": 5
+                                    },
+                                    "price": {
+                                        "title": "price",
+                                        "type": "double",
+                                        "default": "$100.00",
+                                        "minLength": 2
+                                    },
+                                    "description": {
+                                        "title": "description",
+                                        "type": "string",
+                                        "default": "Black Shirt unisex",
+                                        "minLength": 10
+                                    },
+                                    "image": {
+                                        "title": "image",
+                                        "type": "string",
+                                        "default": "black-shirt.jpg"
+                                    },
+                                    "featured": {
+                                        "title": "feature",
+                                        "type": "boolean",
+                                        "default": "false"
+                                    },
+                                    "category": {
+                                        "title": "category",
+                                        "type": "string",
+                                        "default": "men's clothing",
+                                        "minLength": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Product"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "number",
+                                            "default": 204
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "example": "The Product was successfully updated"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Product"
+                ],
+                "summary": "Delete a product",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "b0ec4374bbea41b269194f232976847c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "product id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "title": "status_code",
+                                            "type": "string",
+                                            "default": "204"
+                                        },
+                                        "status": {
+                                            "title": "status",
+                                            "type": "string",
+                                            "default": "success"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "The Product deleted successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "User profile",
+                "description": "Get the authenticated user",
+                "operationId": "f427d7b988216725d15b1ed89d0c7b42",
+                "responses": {
+                    "200": {
+                        "description": "User profile"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List all users",
+                "description": "List all users",
+                "operationId": "f969cdd93a0254f0627c64bc21caac43",
+                "responses": {
+                    "200": {
+                        "description": "list all users"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users/{id}": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "get a single user",
+                "description": "get a single user",
+                "operationId": "b73c9435ca17d926b15c68fcc3c044dc",
+                "responses": {
+                    "200": {
+                        "description": "get a single user"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete a user",
+                "description": "Delete a user",
+                "operationId": "4a34e52fafe30b62fbdcccfc713c6305",
+                "responses": {
+                    "204": {
+                        "description": "delete a user"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update a user",
+                "description": "Update a user",
+                "operationId": "32b377344858687317563981bceaa663",
+                "responses": {
+                    "204": {
+                        "description": "update a user"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Cart": {
+                "title": "Cart",
+                "required": [
+                    "user_id",
+                    "product_name",
+                    "product_id",
+                    "quantity",
+                    "price"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "user_id": {
+                        "title": "user_id",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "product_name": {
+                        "title": "product_name",
+                        "type": "string",
+                        "default": "Gucci Shirt"
+                    },
+                    "product_id": {
+                        "title": "product_id",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "quantity": {
+                        "title": "quantity",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "price": {
+                        "title": "price",
+                        "type": "double",
+                        "default": "199.99"
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "title": "Product",
+                "required": [
+                    "title",
+                    "description",
+                    "category",
+                    "image",
+                    "price"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "title": {
+                        "title": "title",
+                        "type": "string",
+                        "default": "Black Shirt",
+                        "minLength": 5
+                    },
+                    "slug": {
+                        "title": "slug",
+                        "type": "string",
+                        "default": "black-shirt"
+                    },
+                    "price": {
+                        "title": "price",
+                        "type": "double",
+                        "default": "100.00",
+                        "minLength": 2
+                    },
+                    "description": {
+                        "title": "description",
+                        "type": "string",
+                        "default": "Black Shirt unisex",
+                        "minLength": 10
+                    },
+                    "image": {
+                        "title": "image",
+                        "type": "string",
+                        "default": "black-shirt.jpg",
+                        "minLength": 5
+                    },
+                    "featured": {
+                        "title": "featured",
+                        "type": "boolean",
+                        "default": "true"
+                    },
+                    "category": {
+                        "title": "category",
+                        "type": "string",
+                        "default": "men's clothing",
+                        "minLength": 3
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "type": "integer",
+                        "default": "1"
+                    },
+                    "first_name": {
+                        "title": "first_name",
+                        "type": "string",
+                        "default": "John",
+                        "minLength": 3
+                    },
+                    "last_name": {
+                        "title": "last_name",
+                        "type": "string",
+                        "default": "Doe",
+                        "minLength": 3
+                    },
+                    "email": {
+                        "title": "email",
+                        "type": "email",
+                        "default": "john-doe@mail.com"
+                    },
+                    "avatar": {
+                        "title": "avatar",
+                        "type": "string",
+                        "default": "avatar.png"
+                    },
+                    "telephone": {
+                        "title": "telephone",
+                        "type": "telephone",
+                        "default": "080 2566 4567"
+                    },
+                    "activation_token": {
+                        "title": "activation_token",
+                        "type": "string",
+                        "example": "6wjKmRtjddXW79sKXsOrJ9ZnloOY5iuwVm9SlA9Le3xSR8ydD2ugljZwNhPZ"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "Bearer": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "scheme": "Bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Cart"
+        }
+    ],
+    "security": [
+        []
+    ]
+}
