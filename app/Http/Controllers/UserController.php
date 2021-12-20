@@ -33,6 +33,39 @@ class UserController extends Controller
     }
 
     /**
+     * @OA\Patch(
+     *  path="/api/v1/admin/users/{id}",
+     *  tags={"Admin"},
+     *  summary="Update a user",
+     *  security={{ "Bearer":{} }},
+     *  description="Update a user",
+     *  @OA\Response(
+     *      response=204,
+     *      description="update a user",
+     *  )
+     * )
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($request->isMethod('PATCH')) {
+            $user->id = $request->id;
+            $user->role = $request->role;
+            $user->active = $request->active;
+            $user->update();
+            return response()->json([
+                "user" => $user,
+                'success' => true,
+            ], 204);
+        }
+    }
+
+    /**
      * @OA\Get(
      *  path="/api/v1/admin/users",
      *  tags={"Admin"},
@@ -51,11 +84,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        if(Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page',
-            ],401);
+            ], 401);
         }
 
         return response()->json([
@@ -87,8 +120,8 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         return response()->json([
-            "user"=>$user,
-            'success'=>true,
+            "user" => $user,
+            'success' => true,
         ], 200);
     }
 
@@ -110,20 +143,20 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        if ($request->isMethod('PATCH')) {
-            $user->id = $request->id;
-            $user->role = $request->role;
-            $user->active = $request->active;
-            $user->update();
-            return response()->json([
-                "user"=>$user,
-                'success'=>true,
-            ], 204);
-        }
-    }
+    // public function profileUpdate(Request $request, $id)
+    // {
+    //     $user = User::findOrFail($id);
+    //     if ($request->isMethod('PATCH')) {
+    //         $user->id = $request->id;
+    //         $user->role = $request->role;
+    //         $user->active = $request->active;
+    //         $user->update();
+    //         return response()->json([
+    //             "user"=>$user,
+    //             'success'=>true,
+    //         ], 204);
+    //     }
+    // }
 
     /**
      * @OA\Delete(
@@ -144,11 +177,11 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->role !== 'admin') {
+        if (Auth::user()->role !== 'admin') {
             return response()->json([
-            'success' => false,
-            'message' => 'You are Unauthorized to view this page'
-        ],401);
+                'success' => false,
+                'message' => 'You are Unauthorized to view this page'
+            ], 401);
         }
 
         $user = User::findOrFail($id);

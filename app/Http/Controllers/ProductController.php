@@ -6,8 +6,9 @@ use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+// use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
 class ProductController extends Controller
@@ -15,35 +16,35 @@ class ProductController extends Controller
 
 
     /**
-    * Display a listing of the resource.
-    *   @OA\Get(
-    *       path="/api/v1/product",
-    *       operationId="productsList",
-    *       tags={"Product"},
-    *       summary="Retrieve products",
-    *       description="Get all products",
-    *       @OA\Response(
-    *           response=200,
-    *           description="Success operation",
-    *           @OA\JsonContent(
-    *              @OA\Property(type="object", title="data", ref="#/components/schemas/Product", property="data"),
-    *              @OA\Property(type="string", title="status", default="success", property="status"),
-    *              @OA\Property(type="number", title="status_code", property="status_code", default=200),
-    *           )
-    *       )
-    *   )
-    *
-    *
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
-    */
+     * Display a listing of the resource.
+     *   @OA\Get(
+     *       path="/api/v1/product",
+     *       operationId="productsList",
+     *       tags={"Product"},
+     *       summary="Retrieve products",
+     *       description="Get all products",
+     *       @OA\Response(
+     *           response=200,
+     *           description="Success operation",
+     *           @OA\JsonContent(
+     *              @OA\Property(type="object", title="data", ref="#/components/schemas/Product", property="data"),
+     *              @OA\Property(type="string", title="status", default="success", property="status"),
+     *              @OA\Property(type="number", title="status_code", property="status_code", default=200),
+     *           )
+     *       )
+     *   )
+     *
+     *
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function index()
     {
         return (ProductResource::collection(Product::all()))->additional([
-        // return (ProductResource::collection(Product::paginate(10)))->additional([
+            // return (ProductResource::collection(Product::paginate(10)))->additional([
             'status_code' => 200,
-            "status"=> "success",
+            "status" => "success",
         ]);
     }
 
@@ -87,15 +88,15 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //allow agent to create products
-        if(Auth::user()->role !== 'agent') {
+        if (Auth::user()->role !== 'agent') {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'
-            ],401);
+            ], 401);
         }
 
         // Validate requests
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'title' => "required|string|min:3|unique:products|max:255",
             'price' => "required|numeric",
             'description' => 'required|string|min:10',
@@ -111,9 +112,17 @@ class ProductController extends Controller
         //generate slug for product
         $slug = str_replace(' ', '-', $request->input('title'));
 
-        //generate image path for product
-        $filename = $slug.'.jpg';
-        $request->file('image')->storeAs('public/images/products',$filename);
+        //generate image path for product on cloudinary
+        $uploadedFileUrl = Cloudinary::upload(
+            $request->file('image')->getRealPath(),
+            [
+                'folder' => 'e-com-app/images/products/' . $slug,
+                'public_id' => $slug
+            ]
+        )->getSecurePath();
+
+        //generate image path for product locally
+        // $request->file('image')->storeAs('public/images/products', $filename);
 
         if ($request->input('feature') === "true")
             $featured = 1;
@@ -127,14 +136,14 @@ class ProductController extends Controller
             'description' => $request->input('description'),
             'category' => $request->input('category'),
             'feature' => $featured,
-            'image' =>  $filename,
+            'image' =>  $uploadedFileUrl,
         ]);
         // save new product and return the product
         if ($product->save()) {
             return (new ProductResource($product))->additional([
                 'status_code' => 201,
                 'status' => 'success',
-                'message' => 'The '. $product->title . ' was created successfully',
+                'message' => 'The ' . $product->title . ' was created successfully',
             ]);
         }
     }
@@ -229,11 +238,11 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(Auth::user()->role !== 'agent') {
+        if (Auth::user()->role !== 'agent') {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'
-            ],401);
+            ], 401);
         }
 
         $product = Product::findOrFail($id);
@@ -241,23 +250,36 @@ class ProductController extends Controller
         //generate slug for product
         $slug = str_replace(' ', '-', $request->input('title'));
 
-        //generate image path for product
-        $filename = $slug.'.jpg';
-        dd($request->input('title'),$request->file('image'),$request->input('price') ,$id);
-
         // check if request contains file
         if ($request->file('image') !== null) {
-            Storage::disk('public')->delete('/images/products/'.$product->image);
-            $preImage = $filename;
-            $request->file('image')->storeAs('public/images/products',$filename);
+            //delete the image from cloud storage
+            Cloudinary::destroy('e-com-app/images/products/' . $product->slug);
+
+            //delete from local storage
+            // Storage::disk('public')->delete('/images/products/' . $product->image);
+            // $preImage = $filename;
+
+            // generate image path for product
+            $uploadedFileUrl = Cloudinary::upload(
+                $request->file('image')->getRealPath(),
+                [
+                    'folder' => 'e-com-app/images/products/',
+                    'public_id' => $slug
+                ]
+            )->getSecurePath();
+
+            //local storing on of image
+            // $request->file('image')->storeAs('public/images/products', $filename);
         }
 
+
+        //generate image path for product
+        // $filename = $slug . '.jpg';
         if ($request->input('feature') === "true")
             $featured = 1;
         else
             $featured = 0;
 
-        $preImage = $product->image;
         $product->id = $id;
         $product->title = $request->input('title');
         $product->price = $request->input('price');
@@ -265,13 +287,13 @@ class ProductController extends Controller
         $product->description = $request->input('description');
         $product->category = $request->input('category');
         $product->feature = $featured;
-        $product->image = $preImage;
+        $product->image = $request->file('image') === null ? $product->image : $uploadedFileUrl;
 
         if ($product->save()) {
             return (new ProductResource($product))->additional([
                 'status_code' => 204,
                 'status' => 'success',
-                // 'message' => 'The '. $product->title . ' was updated successfully',
+                'message' => 'The ' . $product->title . ' was updated successfully',
             ]);
         }
     }
@@ -310,19 +332,22 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        if(Auth::user()->role !== 'agent') {
+        if (Auth::user()->role !== 'agent') {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'
-            ],401);
+            ], 401);
         }
 
         $delete_product = Product::findOrFail($id);
+
+        // delete from cloud before deleting product
+        Cloudinary::destroy('e-com-app/images/products/' . $delete_product->slug);
         if ($delete_product->delete()) {
             return (new ProductResource($delete_product))->additional([
-                    'status_code' => 204,
-                    'status' => 'success',
-                    // 'message' => 'The '. $delete_product->title . ' was deleted successfully',
+                'status_code' => 204,
+                'status' => 'success',
+                'message' => 'The ' . $delete_product->title . ' was deleted successfully',
             ]);
         }
     }

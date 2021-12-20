@@ -25,23 +25,23 @@ use App\Http\Controllers\CartController;
 // });
 
 Route::group(['prefix' => 'v1'], function () {
-    Route::post('/register', [Auth\AuthController::class,'register'])->name('register');
-    Route::get('/signup/activate/{token}', [Auth\AuthController::class,'signupActivate']);
-    Route::post('activation-token', [Auth\AuthController::class,'requestNewVerificationToken']);
-    Route::post('password-reset/create', [Auth\PasswordResetController::class,'create']);
-    Route::get('password-reset/{token}', [Auth\PasswordResetController::class,'find']);
-    Route::post('password-reset', [Auth\PasswordResetController::class,'reset']);
-    Route::get('product/', [ProductController::class,'index'])->name('index.product');
-    Route::get('product/{id}', [ProductController::class,'show'])->name('show.product');
+    Route::post('/register', [Auth\AuthController::class, 'register'])->name('register');
+    Route::get('/signup/activate/{token}', [Auth\AuthController::class, 'signupActivate']);
+    Route::post('activation-token', [Auth\AuthController::class, 'requestNewVerificationToken']);
+    Route::post('password-reset/create', [Auth\PasswordResetController::class, 'create']);
+    Route::get('password-reset/{token}', [Auth\PasswordResetController::class, 'find']);
+    Route::post('password-reset', [Auth\PasswordResetController::class, 'reset']);
+    Route::get('product/', [ProductController::class, 'index'])->name('index.product');
+    Route::get('product/{id}', [ProductController::class, 'show'])->name('show.product');
     // Route::post('rating', 'RatingController@store');
-    Route::post('login', [Auth\AuthController::class,'login'])->name('login');
+    Route::post('login', [Auth\AuthController::class, 'login'])->name('login');
 
 
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('product/', [ProductController::class,'store'])->name('create.product');
-        Route::put('product/{id}', [ProductController::class,'update'])->name('update.product');
-        Route::delete('product/{id}', [ProductController::class,'destroy'])->name('delete.product');
+        Route::post('product/', [ProductController::class, 'store'])->name('create.product');
+        Route::put('product/{id}', [ProductController::class, 'update'])->name('update.product');
+        Route::delete('product/{id}', [ProductController::class, 'destroy'])->name('delete.product');
 
         Route::prefix('cart')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('cart.index');
@@ -52,15 +52,14 @@ Route::group(['prefix' => 'v1'], function () {
         });
         // Route::post('product/', [ProductController::class,'store'])->name('create.product');
         // Route::match(["put","patch"], 'product/{id}', [ProductController::class,'update'])->name('update.product');
-        Route::get('profile', [UserController::class,'profile'])->name('profile');
-        Route::get('logout', [Auth\AuthController::class,'logout'])->name('logout');
+        Route::get('profile', [UserController::class, 'profile'])->name('profile');
+        Route::get('logout', [Auth\AuthController::class, 'logout'])->name('logout');
 
         Route::prefix('admin')->group(function () {
             Route::get('users/', [UserController::class, 'index'])->name('users.index');
             Route::get('users/{id}', [UserController::class, 'show'])->name('users.show');
             Route::patch('users/{id}', [UserController::class, 'update'])->name('users.update');
-            Route::delete('users/{id}',[UserController::class, 'destroy'])->name('users.delete');
+            Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.delete');
         });
     });
 });
-

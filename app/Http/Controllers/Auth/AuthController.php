@@ -8,16 +8,18 @@ use App\Notifications\SignupActivate;
 use App\Notifications\SignupActivated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+// use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Laravolt\Avatar\Facade as Avatar;
+// use Laravolt\Avatar\Facade as Avatar;
+// use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
 
 class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['login','register','signupActivate', 'requestNewVerificationToken']]);
+        $this->middleware('auth', ['except' => ['login', 'register', 'signupActivate', 'requestNewVerificationToken']]);
     }
 
     /**
@@ -56,7 +58,7 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         // Validate request
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'firstName' => 'required|string|min:3',
             'lastName' => 'required|string|min:3',
             'email' => 'required|email|unique:users',
@@ -81,9 +83,26 @@ class AuthController extends Controller
         ]);
 
         // create avatar
-        $avatar = Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png');
-        //store the avatar
-        Storage::disk('public')->put('images/avatars/'. $user->id . '/avatar.png',(string) $avatar);
+        // $avatar = Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png');
+        // //store the avatar locally
+        // // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
+
+        // //store the avatar on cloud
+        // // $cloudinary->uploadApi()->generateSprite('logo');
+        // $test = Cloudinary::upload(
+        //     Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png')
+        //     // 'public/images/avatars/' . $user->first_name
+        // )->generateSprite($user->first_name);
+        // dd($test);
+        // $uploadedFileUrl =
+        //  Cloudinary::upload(
+        //     // 'public/images/avatars/' . $user->first_name,
+        //     $request->file('image')->getRealPath(),
+        //     [
+        //         'folder' => 'e-com-app/images/avatars/',
+        //         'public_id' => $user->id
+        //     ]
+        // )->getSecurePath();
 
         // save user details
         $user->save();
@@ -93,7 +112,7 @@ class AuthController extends Controller
         // return message
         return response()->json([
             'success' => true,
-            'message'=> 'User Created!'
+            'message' => 'User Created!'
         ], 201);
     }
 
@@ -138,9 +157,9 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            'email'=>'required|email',
-            'password'=>'required|string|min:8',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:8',
             'remember_me' => 'boolean'
         ]);
 
@@ -159,10 +178,10 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Credentials!',
-            ],401);
-        }else {
+            ], 401);
+        } else {
             $token = $user->createToken('‘authToken’')->plainTextToken;
-            if(!$request->input('remember_me') == true){
+            if (!$request->input('remember_me') == true) {
                 return response()->json([
                     'success' => true,
                     'access_token' => $token,
@@ -237,10 +256,10 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'message' => 'This activation token is invalid'
-            ],404);
+            ], 404);
         }
 
-        $user->active =true;
+        $user->active = true;
         $user->activation_token = '';
         $user->email_verified_at = date('Y-m-d H:i:s');
         $user->save();
@@ -292,7 +311,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'User not found, please register',
-            ],404);
+            ], 404);
         }
 
         // if the user already, generate another activation_token
@@ -302,7 +321,7 @@ class AuthController extends Controller
         $user->notify(new SignupActivate($user));
         return response()->json([
             'success' => true,
-            'message'=> 'A new verification link has been sent to your email address'
+            'message' => 'A new verification link has been sent to your email address'
         ], 200);
     }
 }
