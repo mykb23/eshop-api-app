@@ -17,7 +17,7 @@ return [
 
     // 'prefix' => 'api',
 
-    'paths' => ['api/*', '/login', '/sanctum/csrf-cookie', '/products'],
+    'paths' => ['api/*', '/login', '/sanctum/csrf-cookie', '/products', 'api/documentation'],
 
     'allowed_methods' => ['*'],
 
