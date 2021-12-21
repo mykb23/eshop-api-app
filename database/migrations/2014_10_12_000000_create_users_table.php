@@ -18,13 +18,13 @@ class CreateUsersTable extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
-            $table->enum('role',['admin','agent','customer'])->default('customer');
-            $table->string('telephone', 11);
+            $table->enum('role', ['admin', 'agent', 'customer'])->default('customer');
+            $table->string('telephone', 11)->nullable();
             $table->string('avatar')->default('avatar.png');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->boolean('active')->default(false);
-            $table->string('activation_token');
+            $table->string('activation_token')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
