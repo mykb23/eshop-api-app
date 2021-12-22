@@ -91,7 +91,7 @@ class AuthController extends Controller
         // // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
 
         // save user details
-        $user_role =  Role::where("name", $request->input('role'))->first();
+        $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->first() : Role::where("name", 'Customer')->first();
 
         // dd($user_role->id);
         $user->save();

@@ -41,7 +41,7 @@ class User extends Authenticatable
         'email',
         'password',
         'activation_token',
-        'avatar',
+        'profile_picture_path',
         'telephone'
     ];
 
@@ -78,10 +78,10 @@ class User extends Authenticatable
     ];
     // protected $with = ['role'];
 
-    public function getAvatarUrlAttribute()
-    {
-        return Storage::url('images/avatars/' . $this->first_name . '/' . $this->avatar);
-    }
+    // public function getAvatarUrlAttribute()
+    // {
+    //     return Storage::url('images/avatars/' . $this->first_name . '/' . $this->avatar);
+    // }
 
     public function getRoleAttribute()
     {
