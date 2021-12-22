@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,20 +51,20 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-        if ($request->isMethod('PATCH')) {
-            $user->id = $request->id;
-            $user->role = $request->role;
-            $user->active = $request->active;
-            $user->update();
-            return response()->json([
-                "user" => $user,
-                'success' => true,
-            ], 204);
-        }
-    }
+    // public function update(Request $request, $id)
+    // {
+    //     $user = User::findOrFail($id);
+    //     if ($request->isMethod('PATCH')) {
+    //         $user->id = $request->id;
+    //         // $user->role = $request->role;
+    //         $user->active = $request->active;
+    //         $user->update();
+    //         return response()->json([
+    //             "user" => $user,
+    //             'success' => true,
+    //         ], 204);
+    //     }
+    // }
 
     /**
      * @OA\Get(
@@ -84,7 +85,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->role !== 'admin') {
+        if (auth()->user()->hasAnyRoles(['Agent', 'Customer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page',
@@ -94,7 +95,8 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'List of all users',
-            'User' => User::all()
+            'User' => User::all(),
+            'Role' => Role::all()
         ], 200);
     }
 
@@ -143,20 +145,22 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    // public function profileUpdate(Request $request, $id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     if ($request->isMethod('PATCH')) {
-    //         $user->id = $request->id;
-    //         $user->role = $request->role;
-    //         $user->active = $request->active;
-    //         $user->update();
-    //         return response()->json([
-    //             "user"=>$user,
-    //             'success'=>true,
-    //         ], 204);
-    //     }
-    // }
+    public function update(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        if ($request->isMethod('PATCH')) {
+            $user->id = $request->id;
+            $user->role = $request->role;
+            $user->active = $request->active;
+            $user->update();
+
+            $user->roles->sync($request->input('role'));
+            return response()->json([
+                "user" => $user,
+                'success' => true,
+            ], 204);
+        }
+    }
 
     /**
      * @OA\Delete(
@@ -177,7 +181,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if (Auth::user()->role !== 'admin') {
+        if (auth()->user()->hasAnyRoles(['Agent', 'Customer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'

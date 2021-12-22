@@ -87,8 +87,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // dd(auth()->user()->hasAnyRole('Agent'));
         //allow agent to create products
-        if (Auth::user()->role !== 'agent') {
+        if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'
@@ -238,7 +239,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (Auth::user()->role !== 'agent') {
+        if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'
@@ -332,7 +333,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        if (Auth::user()->role !== 'agent') {
+        if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are Unauthorized to view this page'

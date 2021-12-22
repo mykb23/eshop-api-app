@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\SignupActivate;
 use App\Notifications\SignupActivated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 // use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -78,7 +80,8 @@ class AuthController extends Controller
             'email' => stripslashes(strip_tags(trim($request->input('email')))),
             'password' => bcrypt(stripslashes(strip_tags(trim($request->input('password'))))),
             'telephone' => stripslashes(strip_tags(trim($request->input('telephone')))),
-            'role' => stripslashes(strip_tags(trim($request->input('role')))) ? stripslashes(strip_tags(trim($request->input('role')))) : "customer",
+            // 'role_id' => stripslashes(strip_tags(trim($user_role))),
+            // 'role_id' => $role_id,
             'activation_token' => Str::random(60)
         ]);
 
@@ -87,25 +90,13 @@ class AuthController extends Controller
         // //store the avatar locally
         // // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
 
-        // //store the avatar on cloud
-        // // $cloudinary->uploadApi()->generateSprite('logo');
-        // $test = Cloudinary::upload(
-        //     Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png')
-        //     // 'public/images/avatars/' . $user->first_name
-        // )->generateSprite($user->first_name);
-        // dd($test);
-        // $uploadedFileUrl =
-        //  Cloudinary::upload(
-        //     // 'public/images/avatars/' . $user->first_name,
-        //     $request->file('image')->getRealPath(),
-        //     [
-        //         'folder' => 'e-com-app/images/avatars/',
-        //         'public_id' => $user->id
-        //     ]
-        // )->getSecurePath();
-
         // save user details
+        $user_role =  Role::where("name", $request->input('role'))->first();
+
+        // dd($user_role->id);
         $user->save();
+
+        $user->roles()->sync($user_role->id);
 
         // send notification
         $user->notify(new SignupActivate($user));
@@ -180,13 +171,14 @@ class AuthController extends Controller
                 'message' => 'Invalid Credentials!',
             ], 401);
         } else {
+            // dd(Auth::user(), $user->roles[0]->name);
             $token = $user->createToken('‘authToken’')->plainTextToken;
             if (!$request->input('remember_me') == true) {
                 return response()->json([
                     'success' => true,
                     'access_token' => $token,
                     'token_type' => 'Bearer',
-                    'user' => Auth::user()
+                    'user' => Auth::user(),
                 ]);
             }
 
@@ -194,7 +186,8 @@ class AuthController extends Controller
                 'success' => true,
                 'access_token' => $token,
                 'token_type' => 'Bearer',
-                'user' => Auth::user()
+                'user' => Auth::user(),
+                // 'role' => auth()->user()->role
             ]);
         }
     }

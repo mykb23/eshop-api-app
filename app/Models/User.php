@@ -53,6 +53,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'deleted_at',
+        'roles'
     ];
 
     /**
@@ -68,10 +72,35 @@ class User extends Authenticatable
      *
      * string avatar_url
      */
-    protected $appends = ['avatar_url'];
+    protected $appends = [
+        // 'avatar_url',
+        'role'
+    ];
+    // protected $with = ['role'];
 
     public function getAvatarUrlAttribute()
     {
-        return Storage::url('images/avatars/'.$this->first_name.'/'.$this->avatar);
+        return Storage::url('images/avatars/' . $this->first_name . '/' . $this->avatar);
+    }
+
+    public function getRoleAttribute()
+    {
+        return $this->roles[0]->name;
+        // return $this->roles[0]->name;
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasAnyRole(string $role)
+    {
+        return null !== $this->roles()->where('name', $role)->first();
+    }
+
+    public function hasAnyRoles(array $role)
+    {
+        return null !== $this->roles()->whereIn('name', $role)->first();
     }
 }

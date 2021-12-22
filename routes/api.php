@@ -39,9 +39,11 @@ Route::group(['prefix' => 'v1'], function () {
 
 
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::post('product/', [ProductController::class, 'store'])->name('create.product');
-        Route::put('product/{id}', [ProductController::class, 'update'])->name('update.product');
-        Route::delete('product/{id}', [ProductController::class, 'destroy'])->name('delete.product');
+        Route::prefix('agent')->group(function () {
+            Route::post('product/', [ProductController::class, 'store'])->name('product.create.');
+            Route::put('product/{id}', [ProductController::class, 'update'])->name('product.update');
+            Route::delete('product/{id}', [ProductController::class, 'destroy'])->name('product.delete');
+        });
 
         Route::prefix('cart')->group(function () {
             Route::get('/', [CartController::class, 'index'])->name('cart.index');
