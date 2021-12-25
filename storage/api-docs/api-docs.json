@@ -1167,6 +1167,38 @@
                 ]
             }
         },
+        "/api/v1/profile-update/{id}": {
+            "patch": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update profile",
+                "description": "Update user profile",
+                "operationId": "008ad72105825eb0f5a73fdda7993628",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "user id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "update a user"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
         "/api/v1/admin/users": {
             "get": {
                 "tags": [
@@ -1195,6 +1227,18 @@
                 "summary": "get a single user",
                 "description": "get a single user",
                 "operationId": "b73c9435ca17d926b15c68fcc3c044dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "user id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "get a single user"
@@ -1231,6 +1275,18 @@
                 "summary": "Update a user",
                 "description": "Update a user",
                 "operationId": "32b377344858687317563981bceaa663",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "user id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 1
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": "update a user"

@@ -87,8 +87,8 @@ class AuthController extends Controller
 
         // create avatar
         // $avatar = Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png');
-        // //store the avatar locally
-        // // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
+        //store the avatar locally
+        // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
 
         // save user details
         $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->first() : Role::where("name", 'Customer')->first();
@@ -168,10 +168,10 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'success' => false,
+                'status_code' => 401,
                 'message' => 'Invalid Credentials!',
             ], 401);
         } else {
-            // dd(Auth::user(), $user->roles[0]->name);
             $token = $user->createToken('‘authToken’')->plainTextToken;
             if (!$request->input('remember_me') == true) {
                 return response()->json([
@@ -179,7 +179,7 @@ class AuthController extends Controller
                     'access_token' => $token,
                     'token_type' => 'Bearer',
                     'user' => Auth::user(),
-                ]);
+                ], 200);
             }
 
             return response()->json([
@@ -187,8 +187,7 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user' => Auth::user(),
-                // 'role' => auth()->user()->role
-            ]);
+            ], 200);
         }
     }
 
@@ -243,7 +242,6 @@ class AuthController extends Controller
      */
     public function signupActivate(Request $request)
     {
-        // dd($request->token);
         $user = User::where('activation_token', $request->token)->first();
 
         if (!$user) {
@@ -258,6 +256,9 @@ class AuthController extends Controller
         $user->save();
 
         $user->notify(new SignupActivated($user));
+
+        // TODO: Do a redirect to the frontend
+
         // return redirect()->away(env('APP_FRONTEND_URL'));
         return $user;
     }

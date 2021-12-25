@@ -336,8 +336,9 @@ class ProductController extends Controller
         if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
             return response()->json([
                 'success' => false,
+                'status_code' => 401,
                 'message' => 'You are Unauthorized to view this page'
-            ], 401);
+            ]);
         }
 
         $delete_product = Product::findOrFail($id);

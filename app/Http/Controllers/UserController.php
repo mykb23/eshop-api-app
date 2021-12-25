@@ -35,11 +35,21 @@ class UserController extends Controller
 
     /**
      * @OA\Patch(
-     *  path="/api/v1/admin/users/{id}",
-     *  tags={"Admin"},
-     *  summary="Update a user",
+     *  path="/api/v1/profile-update/{id}",
+     *  tags={"Auth"},
+     *  summary="Update profile",
      *  security={{ "Bearer":{} }},
-     *  description="Update a user",
+     *  description="Update user profile",
+     * @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="user id",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          required=true,
+     *          example=1
+     *      ),
      *  @OA\Response(
      *      response=204,
      *      description="update a user",
@@ -51,20 +61,21 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    // public function update(Request $request, $id)
-    // {
-    //     $user = User::findOrFail($id);
-    //     if ($request->isMethod('PATCH')) {
-    //         $user->id = $request->id;
-    //         // $user->role = $request->role;
-    //         $user->active = $request->active;
-    //         $user->update();
-    //         return response()->json([
-    //             "user" => $user,
-    //             'success' => true,
-    //         ], 204);
-    //     }
-    // }
+    public function profileUpdate(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        // dd($request->all(), $id);
+
+        $user->update($request->except(['roles']));
+        if (!empty($request->input('roles'))) {
+            $user->roles()->sync($request->roles);
+        }
+
+        return response()->json([
+            "user" => $user,
+            'success' => true,
+        ], 204);
+    }
 
     /**
      * @OA\Get(
@@ -107,6 +118,16 @@ class UserController extends Controller
      *  summary="get a single user",
      *  description="get a single user",
      *  security={{ "Bearer":{} }},
+     *  @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="user id",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          required=true,
+     *          example=1
+     *      ),
      *  @OA\Response(
      *      response=200,
      *      description="get a single user",
@@ -120,6 +141,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        if (auth()->user()->hasAnyRoles(['Agent', 'Customer'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are Unauthorized to view this page'
+            ], 401);
+        }
+        // dd(auth()->user());
         $user = User::findOrFail($id);
         return response()->json([
             "user" => $user,
@@ -134,6 +162,16 @@ class UserController extends Controller
      *  summary="Update a user",
      *  security={{ "Bearer":{} }},
      *  description="Update a user",
+     * @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="user id",
+     *          @OA\Schema(
+     *              type="integer",
+     *          ),
+     *          required=true,
+     *          example=1
+     *      ),
      *  @OA\Response(
      *      response=204,
      *      description="update a user",
@@ -147,10 +185,16 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (auth()->user()->hasAnyRoles(['Agent', 'Customer'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are Unauthorized to view this page'
+            ], 401);
+        }
+
         $user = User::findOrFail($id);
         if ($request->isMethod('PATCH')) {
             $user->id = $request->id;
-            $user->role = $request->role;
             $user->active = $request->active;
             $user->update();
 

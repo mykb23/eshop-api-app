@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Tag(
@@ -17,6 +16,7 @@ class CartController extends Controller
     {
         $this->middleware('auth');
     }
+
     /**
      * @OA\Get(
      *      path="/api/v1/cart",
@@ -38,14 +38,14 @@ class CartController extends Controller
     public function index()
     {
         // get the user id from auth
-        $user_id = Auth::user()->id;
+        $user_id = auth()->user()->id;
         // get all the products associated with this user
-        $cart = Cart::where('user_id', $user_id);
+        $cart = Cart::where('user_id', $user_id)->get();
 
         return response()->json([
             "success" => true,
             "cart" => $cart
-        ],200);
+        ], 200);
     }
 
     /**
@@ -83,23 +83,22 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = Auth::user()->id;
+        $user_id = auth()->user()->id;
         $cart = new Cart([
             'user_id' => $user_id,
-            'product_name'=>$request->input('product_name'),
+            'product_name' => $request->input('product_name'),
             'product_id' => $request->input('product_id'),
-            'product_price' => $request->input('price'),
+            'product_price' => $request->input('product_price'),
             'quantity' => $request->input('quantity'),
         ]);
 
-        if ($cart->save()) {
-            return response()->json([
-                "cart"=> $cart,
-                'status_code' => 201,
-                'status' => 'success',
-            ]);
-        }
+        $cart->save();
 
+        return response()->json([
+            "cart" => $cart,
+            'status_code' => 201,
+            'status' => 'success',
+        ]);
     }
 
     /**
@@ -137,25 +136,17 @@ class CartController extends Controller
      * @param  \App\Models\Cart  $cart
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,$id)
+    public function update(Request $request, $id)
     {
         $cart = Cart::findOrFail($id);
-        if ($request->isMethod('PATCH')) {
-            $cart->id = $id;
-            $cart->quantity = $request->quantity;
-            if ($cart->update()) {
-                return response()->json([
-                    'cart' => $cart,
-                    'status_code' => 204,
-                    'status' => 'success',
-                ],204);
-            }else{
-                return response()->json([
-                    'status_code' => 400,
-                    'status' => 'failed',
-                ],400);
-            }
-        }
+
+        $cart->update($request->all());
+
+        return response()->json([
+            'cart' => $cart,
+            'status_code' => 204,
+            'status' => 'success',
+        ], 204);
     }
 
     /**
@@ -182,7 +173,7 @@ class CartController extends Controller
         Cart::where('id', $id)->delete();
         return response()->json([
             "success" => true,
-        ],204);
+        ], 204);
     }
 
     /**
@@ -204,7 +195,7 @@ class CartController extends Controller
      */
     public function clearAllCart()
     {
-        $user_id = Auth::user()->id;
+        $user_id = auth()->user()->id;
         Cart::where('user_id', $user_id)->delete();
         return response()->json([
             "success" => true,

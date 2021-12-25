@@ -56,6 +56,8 @@ class User extends Authenticatable
         'two_factor_secret',
         'two_factor_recovery_codes',
         'deleted_at',
+        'created_at',
+        'updated_at',
         'roles'
     ];
 
@@ -83,10 +85,10 @@ class User extends Authenticatable
     //     return Storage::url('images/avatars/' . $this->first_name . '/' . $this->avatar);
     // }
 
+    // return $this->roles[0]->name;
     public function getRoleAttribute()
     {
-        return $this->roles[0]->name;
-        // return $this->roles[0]->name;
+        return $this->roles;
     }
 
     public function roles()

@@ -52,9 +52,9 @@ Route::group(['prefix' => 'v1'], function () {
             Route::delete('remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
             Route::delete('clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
         });
-        // Route::post('product/', [ProductController::class,'store'])->name('create.product');
-        // Route::match(["put","patch"], 'product/{id}', [ProductController::class,'update'])->name('update.product');
+
         Route::get('profile', [UserController::class, 'profile'])->name('profile');
+        Route::patch('profile-update/{id}', [UserController::class, 'profileUpdate'])->name('updateProfile');
         Route::get('logout', [Auth\AuthController::class, 'logout'])->name('logout');
 
         Route::prefix('admin')->group(function () {
