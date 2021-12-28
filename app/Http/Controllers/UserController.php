@@ -103,11 +103,14 @@ class UserController extends Controller
             ], 401);
         }
 
+        $user = User::with('roles')->get();
+        // dd($user);
         return response()->json([
             'success' => true,
             'message' => 'List of all users',
-            'User' => User::all(),
-            'Role' => Role::all()
+            // 'user' => $user
+            'user' => User::with('roles')->paginate(2),
+            'roles' => Role::all()
         ], 200);
     }
 

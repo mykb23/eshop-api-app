@@ -41,8 +41,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return (ProductResource::collection(Product::all()))->additional([
-            // return (ProductResource::collection(Product::paginate(10)))->additional([
+        return (ProductResource::collection(Product::paginate(10)))->additional([
             'status_code' => 200,
             "status" => "success",
         ]);

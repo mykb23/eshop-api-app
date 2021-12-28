@@ -58,6 +58,7 @@ class User extends Authenticatable
         'deleted_at',
         'created_at',
         'updated_at',
+        'activation_token',
         'roles'
     ];
 
