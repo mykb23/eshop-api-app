@@ -41,7 +41,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return (ProductResource::collection(Product::paginate(10)))->additional([
+        return (ProductResource::collection(Product::paginate(6)))->additional([
             'status_code' => 200,
             "status" => "success",
         ]);
@@ -88,12 +88,12 @@ class ProductController extends Controller
     {
         // dd(auth()->user()->hasAnyRole('Agent'));
         //allow agent to create products
-        if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You are Unauthorized to view this page'
-            ], 401);
-        }
+        // if (auth()->user()->hasAnyRoles(['Admin', 'Customer'])) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'You are Unauthorized to view this page'
+        //     ], 401);
+        // }
 
         // Validate requests
         $validator = Validator::make($request->all(), [
@@ -102,8 +102,10 @@ class ProductController extends Controller
             'description' => 'required|string|min:10',
             'category' => 'required|string|min:10',
             'image' => 'required|mimes:jpeg,jpg,png,gif,svg|max:2048',
+            'featured' => 'required|numeric'
         ]);
 
+        // dd($request->all());
         // check if there is errors
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 409);
@@ -124,10 +126,7 @@ class ProductController extends Controller
         //generate image path for product locally
         // $request->file('image')->storeAs('public/images/products', $filename);
 
-        if ($request->input('feature') === "true")
-            $featured = 1;
-        else
-            $featured = 0;
+        // dd($request->input('featured'));
         //Assign various attributes to the product
         $product = new Product([
             'title' => $request->input('title'),
@@ -135,7 +134,7 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $request->input('description'),
             'category' => $request->input('category'),
-            'feature' => $featured,
+            'featured' => $request->input('featured'),
             'image' =>  $uploadedFileUrl,
         ]);
         // save new product and return the product
@@ -273,20 +272,13 @@ class ProductController extends Controller
         }
 
 
-        //generate image path for product
-        // $filename = $slug . '.jpg';
-        if ($request->input('feature') === "true")
-            $featured = 1;
-        else
-            $featured = 0;
-
         $product->id = $id;
         $product->title = $request->input('title');
         $product->price = $request->input('price');
         $product->slug = $slug;
         $product->description = $request->input('description');
         $product->category = $request->input('category');
-        $product->feature = $featured;
+        $product->featured = $request->input('featured');
         $product->image = $request->file('image') === null ? $product->image : $uploadedFileUrl;
 
         if ($product->save()) {

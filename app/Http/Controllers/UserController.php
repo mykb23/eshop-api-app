@@ -6,6 +6,9 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use App\Notifications\SignupActivate;
 
 class UserController extends Controller
 {
@@ -104,12 +107,24 @@ class UserController extends Controller
         }
 
         $user = User::with('roles')->get();
-        // dd($user);
+        // dd(User::whereHas('roles', function ($q) {
+        //     $q->where('name', 'Admin');
+        // })->get()->count());
         return response()->json([
             'success' => true,
             'message' => 'List of all users',
-            // 'user' => $user
-            'user' => User::with('roles')->paginate(2),
+            'numberOfUsers' => [
+                'numberOfAdministrators' => User::whereHas('roles', function ($q) {
+                    $q->where('name', '=', 'Admin');
+                })->get()->count(),
+                'numberOfAgents' => User::whereHas('roles', function ($q) {
+                    $q->where('name', '=', 'Agent');
+                })->get()->count(),
+                'numberOfCustomers' => User::whereHas('roles', function ($q) {
+                    $q->where('name', '=', 'Customer');
+                })->get()->count()
+            ],
+            'users_list' => User::with('roles')->paginate(6),
             'roles' => Role::all()
         ], 200);
     }
@@ -158,6 +173,54 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function store(Request $request)
+    {
+        if (auth()->user()->hasAnyRoles(['Agent', 'Customer'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are Unauthorized to view this page'
+            ], 401);
+        }
+        // Validate request
+        $validator = Validator::make($request->all(), [
+            'firstName' => 'required|string|min:3',
+            'lastName' => 'required|string|min:3',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed|min:8',
+            'role' => 'required'
+        ]);
+
+        // dd($request->all());
+        // check if there is errors
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 409);
+        }
+
+        // dd($request->all());
+        // create user
+        $user = new User([
+            'first_name' => stripslashes(strip_tags(trim($request->input('firstName')))),
+            'last_name' => stripslashes(strip_tags(trim($request->input('lastName')))),
+            'email' => stripslashes(strip_tags(trim($request->input('email')))),
+            'password' => bcrypt(stripslashes(strip_tags(trim($request->input('password'))))),
+            'telephone' => stripslashes(strip_tags(trim($request->input('telephone')))),
+            'activation_token' => Str::random(60)
+        ]);
+
+        $user->save();
+
+        $user_role =  Role::where("name", $request->input('role'))->first();
+
+        $user->roles()->sync($request->input('role'));
+
+        // send notification
+        $user->notify(new SignupActivate($user));
+        // return message
+        return response()->json([
+            'success' => true,
+            'message' => 'User Created!'
+        ], 201);
+    }
     /**
      * @OA\Patch(
      *  path="/api/v1/admin/users/{id}",
@@ -195,18 +258,19 @@ class UserController extends Controller
             ], 401);
         }
 
+        // dd(request()->input('role'));
         $user = User::findOrFail($id);
-        if ($request->isMethod('PATCH')) {
-            $user->id = $request->id;
-            $user->active = $request->active;
-            $user->update();
+        // if ($request->isMethod('PATCH')) {
+        // $user->id = $request->id;
+        // $user->active = $request->active;
+        // $user->update();
 
-            $user->roles->sync($request->input('role'));
-            return response()->json([
-                "user" => $user,
-                'success' => true,
-            ], 204);
-        }
+        $user->roles()->sync($request->input('role'));
+        return response()->json([
+            "user" => $user,
+            'success' => true,
+        ], 204);
+        // }
     }
 
     /**

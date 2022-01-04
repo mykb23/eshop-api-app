@@ -10,11 +10,11 @@ use App\Notifications\SignupActivated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-// use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-// use Laravolt\Avatar\Facade as Avatar;
-// use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Laravolt\Avatar\Facade as Avatar;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 
 class AuthController extends Controller
@@ -73,6 +73,13 @@ class AuthController extends Controller
             return response()->json(['error' => $validator->errors()], 409);
         }
 
+        // create avatar
+        // $avatar = Avatar::create(Str::upper($request->input('firstName')) . ' ' . Str::upper($request->input('lastName')))->getImageObject()->encode('png');
+
+        // //store the avatar locally
+        // $path = Storage::disk('public')->put('images/avatars/' . $request->input('firstName') . '.png', (string) $avatar);
+
+
         // create user
         $user = new User([
             'first_name' => stripslashes(strip_tags(trim($request->input('firstName')))),
@@ -85,10 +92,6 @@ class AuthController extends Controller
             'activation_token' => Str::random(60)
         ]);
 
-        // create avatar
-        // $avatar = Avatar::create(Str::upper($user->first_name) . ' ' . Str::upper($user->last_name))->getImageObject()->encode('png');
-        //store the avatar locally
-        // Storage::disk('disk')->put('images/avatars/' . $user->first_name . '.png', (string) $avatar);
 
         // save user details
         $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->first() : Role::where("name", 'Customer')->first();

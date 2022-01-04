@@ -17,10 +17,10 @@ class CreateProductTable extends Migration
             $table->id();
             $table->string('title')->unique();
             $table->string('slug');
-            $table->decimal('price',10,2);
+            $table->decimal('price', 10, 2);
             $table->text('description');
             $table->string('image');
-            $table->boolean('feature')->default(false);
+            $table->string('featured');
             $table->string('category');
             $table->timestamps();
         });
