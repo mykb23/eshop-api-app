@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Notifications\SignupActivate;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class UserController extends Controller
 {
@@ -33,7 +34,7 @@ class UserController extends Controller
      */
     public function profile()
     {
-        return response()->json(['User' => Auth::user()], 200);
+        return response()->json(['user' => Auth::user()], 200);
     }
 
     /**
@@ -64,20 +65,42 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function profileUpdate(Request $request, $id)
+    public function profileUpdate(Request $request, int $id)
     {
-        $user = User::findOrFail($id);
-        // dd($request->all(), $id);
-
-        $user->update($request->except(['roles']));
-        if (!empty($request->input('roles'))) {
-            $user->roles()->sync($request->roles);
+        if (auth()->user()->id !== $id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are Unauthorized to view this page'
+            ], 401);
         }
 
+        $user = User::findOrFail($id);
+
+        if ($request->file('image')) {
+            Cloudinary::destroy('e-com-app/images/avatars/' . $user->id);
+
+            $uploadedFileUrl = Cloudinary::upload(
+                $request->file('image')->getRealPath(),
+                [
+                    'folder' => 'e-com-app/images/avatars/' . $id,
+                    'public_id' => $id
+                ]
+            )->getSecurePath();
+        }
+
+        $user->id = $id;
+        $user->first_name = $request->input('firstName');
+        $user->last_name = $request->input('lastName');
+        $user->email = $request->input('email');
+        $user->telephone = $request->input('telephone');
+        $user->profile_picture_path = empty($uploadedFileUrl) ? $user->profile_picture_path : $uploadedFileUrl;
+        $user->save();
+
         return response()->json([
-            "user" => $user,
             'success' => true,
-        ], 204);
+            'message' => 'Profile successfully updated!',
+            'user' => $user
+        ]);
     }
 
     /**

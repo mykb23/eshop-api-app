@@ -41,7 +41,10 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return (ProductResource::collection(Product::paginate(6)))->additional([
+        $featured = Product::where('featured', 1)->get();
+
+        return (ProductResource::collection(Product::paginate(8)))->additional([
+            'featured_product' => $featured,
             'status_code' => 200,
             "status" => "success",
         ]);
@@ -250,26 +253,26 @@ class ProductController extends Controller
         $slug = str_replace(' ', '-', $request->input('title'));
 
         // check if request contains file
-        if ($request->file('image') !== null) {
-            //delete the image from cloud storage
-            Cloudinary::destroy('e-com-app/images/products/' . $product->slug);
+        // if ($request->file('image') !== null) {
+        //delete the image from cloud storage
+        Cloudinary::destroy('e-com-app/images/products/' . $product->slug);
 
-            //delete from local storage
-            // Storage::disk('public')->delete('/images/products/' . $product->image);
-            // $preImage = $filename;
+        //delete from local storage
+        // Storage::disk('public')->delete('/images/products/' . $product->image);
+        // $preImage = $filename;
 
-            // generate image path for product
-            $uploadedFileUrl = Cloudinary::upload(
-                $request->file('image')->getRealPath(),
-                [
-                    'folder' => 'e-com-app/images/products/',
-                    'public_id' => $slug
-                ]
-            )->getSecurePath();
+        // generate image path for product
+        $uploadedFileUrl = Cloudinary::upload(
+            $request->file('image')->getRealPath(),
+            [
+                'folder' => 'e-com-app/images/products/' . $slug,
+                'public_id' => $slug
+            ]
+        )->getSecurePath();
 
-            //local storing on of image
-            // $request->file('image')->storeAs('public/images/products', $filename);
-        }
+        //local storing on of image
+        // $request->file('image')->storeAs('public/images/products', $filename);
+        // }
 
 
         $product->id = $id;

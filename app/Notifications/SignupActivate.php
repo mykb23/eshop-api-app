@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Jenssegers\Agent\Agent;
+
 
 class SignupActivate extends Notification
 {
@@ -40,7 +42,14 @@ class SignupActivate extends Notification
      */
     public function toMail($notifiable)
     {
-        $url = url('/api/v1/signup/activate/' . $notifiable->activation_token);
+        $agent = new Agent();
+
+        if ($agent->isPhone()) {
+            $incomingUrl = env('MOBILE_URL');
+        }
+        $incomingUrl = env('FRONTEND_URL') . 'activate-account/';
+        // dd($agent);
+        $url = url($incomingUrl . $notifiable->activation_token);
 
         return (new MailMessage)
             ->subject('Confirm your account')

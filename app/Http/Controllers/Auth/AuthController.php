@@ -16,7 +16,6 @@ use Illuminate\Support\Str;
 use Laravolt\Avatar\Facade as Avatar;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
-
 class AuthController extends Controller
 {
     public function __construct()
@@ -92,21 +91,19 @@ class AuthController extends Controller
             'activation_token' => Str::random(60)
         ]);
 
-
         // save user details
-        $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->first() : Role::where("name", 'Customer')->first();
+        // $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->get() : Role::where("name", 'Customer')->get();
 
-        // dd($user_role->id);
         $user->save();
 
-        $user->roles()->sync($user_role->id);
+        $user->roles()->sync($request->input('role'));
 
         // send notification
         $user->notify(new SignupActivate($user));
         // return message
         return response()->json([
             'success' => true,
-            'message' => 'User Created!'
+            'message' => 'User Created!',
         ], 201);
     }
 
@@ -168,6 +165,12 @@ class AuthController extends Controller
         // check if the user exists
         $user = User::where('email', $request->email)->first();
 
+        if ($user->active === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Account is not verified. Please verify your account and try again.',
+            ], 401);
+        }
         if (!Auth::attempt($credentials)) {
             return response()->json([
                 'success' => false,

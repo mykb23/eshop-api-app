@@ -22,8 +22,8 @@ class CartController extends Controller
      *      path="/api/v1/cart",
      *      description="Get all products in cart",
      *      tags={"Cart"},
-     *      summary="Get all products in cart",
      *      security={{ "Bearer":{} }},
+     *      summary="Get all products in cart",
      *      @OA\Response(
      *          response=200,
      *          description="Success operation",

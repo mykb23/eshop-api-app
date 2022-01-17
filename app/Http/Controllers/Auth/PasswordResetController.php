@@ -57,8 +57,9 @@ class PasswordResetController extends Controller
      */
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            'email' => 'required|email|string'
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|string',
+            'redirect_url' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -74,19 +75,25 @@ class PasswordResetController extends Controller
             ], 404);
         }
 
+        // ['email' => $user->email],
+        // 'redirect_url' => $request->input('redirect_url')
+        // exit;
+        $url = $request->redirect_url;
         $passwordReset = PasswordReset::updateOrCreate(
-            ['email' => $user->email],
-            ['email' => $user->email, 'token' => Str::random(60),'redirect_url' => $request->redirect_url],
+            ['email' => $user->email, 'redirect_url' => $url],
+            ['email' => $user->email, 'token' => Str::random(60), 'redirect_url' => $url],
         );
+        // dd($request->redirect_url);
+        // dd($passwordReset);
 
         if ($user && $passwordReset) {
-            $user->notify(new PasswordResetRequest($passwordReset->token));
+            $user->notify(new PasswordResetRequest(Crypt::encrypt($passwordReset->token)));
         }
 
         return response()->json([
             'success' => true,
             'message' => 'We have e-mailed your password reset link!'
-        ],201);
+        ], 201);
     }
 
     /**
@@ -129,11 +136,11 @@ class PasswordResetController extends Controller
 
     public function find($token)
     {
-        $passwordReset = PasswordReset::where('token', $token)->first();
+        $passwordReset = PasswordReset::where('token', Crypt::decrypt($token))->first();
 
         if (!$passwordReset) {
             return response()->json([
-                "success"=>false,
+                "success" => false,
                 'message' => 'This password reset token is invalid.'
             ], 404);
         }
@@ -146,13 +153,11 @@ class PasswordResetController extends Controller
             ], 404);
         }
 
-        if ($passwordReset->redirect_url !== env('FRONTEND_URL')) {
-            // return redirect()->away(env('FRONTEND_URL'))->with("token", 'cVirkKfR6wg4NPbfjMAdEmzHacztBeP2twIPm6StoTDsvHUWymvcrlJD9cDB');
-            return response()->json($passwordReset);
-        }
-        // dd($passwordReset);
-        // urlencode((string) $token);
-        return redirect()->away(env('FRONTEND_URL').'?token='.Crypt::encryptString($token).'&?email='.Crypt::encryptString($passwordReset->email));
+        return response()->json([
+            'token' => Crypt::encrypt($passwordReset->token),
+            'email' => Crypt::encrypt($passwordReset->email),
+            'redirect_url' => $passwordReset->redirect_url
+        ]);
     }
 
     /**
@@ -206,8 +211,8 @@ class PasswordResetController extends Controller
      */
     public function reset(Request $request)
     {
-        $validator = Validator::make($request->all(),[
-            'email' => 'required|email|string',
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
             'password' => 'required|string|confirmed',
             'token' => 'required|string',
         ]);
@@ -217,22 +222,22 @@ class PasswordResetController extends Controller
         }
 
         $passwordReset = PasswordReset::where([
-            'token' => $request->input('token'),
-            'email' => $request->input('email')
+            'token' => Crypt::decrypt($request->input('token')),
+            'email' => Crypt::decrypt($request->input('email'))
         ])->first();
 
         if (!$passwordReset) {
             return response()->json([
-                "success"=>false,
+                "success" => false,
                 'message' => 'This password reset token is invalid.'
             ], 404);
         }
 
-        $user = User::where('email', $request->input('email'))->first();
+        $user = User::where('email', Crypt::decrypt($request->input('email')))->first();
 
         if (!$user) {
             return response()->json([
-                "success"=>false,
+                "success" => false,
                 'message' => 'We can"t find a user with that e-mail address.'
             ], 404);
         }
@@ -248,6 +253,87 @@ class PasswordResetController extends Controller
         return response()->json([
             "success" => true,
             "user" => $user,
-        ],201);
+        ], 201);
+    }
+
+    /**
+     * CHange Password
+     *
+     * @OA\Post(
+     *      path="/api/v1/password-change/",
+     *      tags={"Auth"},
+     *      summary="Change Password",
+     *      description="In application password change",
+     *      security={{ "Bearer":{} }},
+     *      @OA\RequestBody(
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  required={"email","password","password_confirmation"},
+     *                  @OA\Property(type="email", title="email", default="JohnDoe@mail.com", property="email"),
+     *                  @OA\Property(type="password", title="password", default="********", property="password", minLength=8),
+     *                  @OA\Property(type="password", title="password_confirmation", default="********", property="password_confirmation", minLength=8),
+     *              )
+     *          )
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=201,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(type="boolean",title="success",default="true",property="success"),
+     *              @OA\Property(type="object",title="user",ref="#/components/schemas/User",property="user"),
+     *          ),
+     *      ),
+     *
+     *      @OA\Response(
+     *          response=404,
+     *          description="Not found",
+     *          @OA\JsonContent(
+     *              @OA\Property(type="boolean",title="success",default="false",property="success"),
+     *              @OA\Property(type="string",title="message",default="We can't find a user with that email address.",property="message"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=409,
+     *          description="Errors",
+     *      ),
+     * )
+     * @param [string] email
+     * @param [string] password
+     * @param [string] password_confirmation
+     * @param [string] token
+     * @return [string] message
+     * @return [json] user object
+     */
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|string',
+            'password' => 'required|string|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 409);
+        }
+
+        $user = User::where('email', $request->input('email'))->first();
+
+        if (!$user) {
+            return response()->json([
+                "success" => false,
+                'message' => 'We can"t find a user with that e-mail address.'
+            ], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        $user->notify(new PasswordResetSuccess([]));
+
+        return response()->json([
+            "success" => true,
+            "user" => $user,
+        ], 201);
     }
 }

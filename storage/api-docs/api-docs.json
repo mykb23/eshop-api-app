@@ -585,6 +585,101 @@
                 }
             }
         },
+        "/api/v1/password-change/": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Change Password",
+                "description": "In application password change",
+                "operationId": "1be4d2efbf5d0ff435f89d33cc33ddfb",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "title": "email",
+                                        "type": "email",
+                                        "default": "JohnDoe@mail.com"
+                                    },
+                                    "password": {
+                                        "title": "password",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "title": "password_confirmation",
+                                        "type": "password",
+                                        "default": "********",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "true"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "title": "success",
+                                            "type": "boolean",
+                                            "default": "false"
+                                        },
+                                        "message": {
+                                            "title": "message",
+                                            "type": "string",
+                                            "default": "We can't find a user with that email address."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Errors"
+                    }
+                },
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ]
+            }
+        },
         "/api/v1/cart": {
             "get": {
                 "tags": [
