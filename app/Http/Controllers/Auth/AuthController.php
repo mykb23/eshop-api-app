@@ -86,8 +86,6 @@ class AuthController extends Controller
             'email' => stripslashes(strip_tags(trim($request->input('email')))),
             'password' => bcrypt(stripslashes(strip_tags(trim($request->input('password'))))),
             'telephone' => stripslashes(strip_tags(trim($request->input('telephone')))),
-            // 'role_id' => stripslashes(strip_tags(trim($user_role))),
-            // 'role_id' => $role_id,
             'activation_token' => Str::random(60)
         ]);
 

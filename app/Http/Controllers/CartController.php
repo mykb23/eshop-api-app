@@ -58,11 +58,13 @@ class CartController extends Controller
      *      @OA\MediaType(
      *          mediaType="application/json",
      *          @OA\Schema(
-     *              required={"product_name","product_id","product_price","quantity"},
+     *              required={"product_name","product_id","product_price","quantity","image","user_id"},
      *              @OA\Property(type="integer",title="product_id",example=1,property="product_id"),
      *              @OA\Property(type="string",title="product_name",example="Gucci Shirt",property="product_name"),
+     *              @OA\Property(type="string",title="image",example="https://res.cloudinary.com/mykb/image/upload/v1643027274/e-com-app/images/products/default/no-image.png",property="image"),
      *              @OA\Property(type="integer",title="product_price",example=1,property="product_price"),
      *              @OA\Property(type="integer",title="quantity",example=1,property="quantity"),
+     *              @OA\Property(type="integer",title="user_id",example=1,property="user_id"),
      *          )
      *      )
      *  ),
@@ -83,22 +85,43 @@ class CartController extends Controller
      */
     public function store(Request $request)
     {
-        $user_id = auth()->user()->id;
-        $cart = new Cart([
-            'user_id' => $user_id,
-            'product_name' => $request->input('product_name'),
-            'product_id' => $request->input('product_id'),
-            'product_price' => $request->input('product_price'),
-            'quantity' => $request->input('quantity'),
-        ]);
+        if ($request->has('cart')) {
+            // dd($request->has('cart'), $request->cart['product_id']);
+            $cart = Cart::create([
+                'product_id' => $request->cart['product_id'],
+                'product_name' => $request->cart['product_name'],
+                'product_price' => $request->cart['product_price'],
+                'image' => $request->cart['image'],
+                'quantity' => $request->cart['quantity'],
+                'user_id' => $request->cart['user_id']
+            ]);
 
-        $cart->save();
+            return response()->json([
+                "cart" => $cart,
+                'status_code' => 201,
+                'status' => 'success',
+            ], 201);
+        } else {
+            $data = $request->collect();
+            $cart = $data->each(function ($cartItem) {
+                Cart::upsert([
+                    [
+                        'product_id' => $cartItem['product_id'],
+                        'product_name' => $cartItem['product_name'],
+                        'product_price' => $cartItem['product_price'],
+                        'image' => $cartItem['image'],
+                        'quantity' => $cartItem['quantity'],
+                        'user_id' => $cartItem['user_id']
+                    ],
+                ], ['id', 'product_name'], ['quantity']);
+            });
 
-        return response()->json([
-            "cart" => $cart,
-            'status_code' => 201,
-            'status' => 'success',
-        ]);
+            return response()->json([
+                "cart" => $cart,
+                'status_code' => 201,
+                'status' => 'success',
+            ], 201);
+        }
     }
 
     /**
@@ -140,7 +163,9 @@ class CartController extends Controller
     {
         $cart = Cart::findOrFail($id);
 
-        $cart->update($request->all());
+        // dd($cart, $request->quantity);
+        $cart->quantity = $request->input('quantity');
+        $cart->save();
 
         return response()->json([
             'cart' => $cart,

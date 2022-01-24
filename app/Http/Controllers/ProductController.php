@@ -52,7 +52,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Post(
-     *      tags={"Product"},
+     *      tags={"Agent"},
      *      path="/api/v1/product",
      *      summary="Create a new product",
      *      security={{ "Bearer":{} }},
@@ -191,7 +191,7 @@ class ProductController extends Controller
 
     /**
      * @OA\Put(
-     *      tags={"Product"},
+     *      tags={"Agent"},
      *      path="/api/v1/product/{id}",
      *      summary="Update product",
      *      security={{ "Bearer":{} }},
@@ -297,7 +297,7 @@ class ProductController extends Controller
      * Remove the specified resource from storage.
      * @OA\Delete(
      *      path="/api/v1/product/{id}",
-     *      tags={"Product"},
+     *      tags={"Agent"},
      *      security={{ "Bearer":{} }},
      *      summary="Delete a product",
      *      @OA\Parameter(

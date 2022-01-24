@@ -15,38 +15,6 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert(
-            [
-                'first_name'           => 'Admin',
-                'last_name'           => 'User',
-                'email'          => 'admin@admin.com',
-                'password'       => bcrypt('password'),
-                'role'           => 'admin',
-                'remember_token' => null,
-            ]
-        );
-        DB::table('users')->insert(
-            [
-                'first_name'           => 'Agent',
-                'last_name'           => 'User',
-                'email'          => 'agent@agent.com',
-                'password'       => bcrypt('password'),
-                'role'           => 'agent',
-                'remember_token' => null,
-
-            ]
-        );
-        DB::table('users')->insert(
-            [
-                'first_name'           => 'Customer',
-                'last_name'           => 'User',
-                'email'          => 'customer@cutomer.com',
-                'password'       => bcrypt('password'),
-                'remember_token' => null,
-            ],
-        );
-        // $users = [];
-
-        // User::insert($users);
+        User::factory()->count(10)->create();
     }
 }

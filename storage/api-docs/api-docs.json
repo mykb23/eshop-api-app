@@ -720,7 +720,9 @@
                                     "product_name",
                                     "product_id",
                                     "product_price",
-                                    "quantity"
+                                    "quantity",
+                                    "image",
+                                    "user_id"
                                 ],
                                 "properties": {
                                     "product_id": {
@@ -733,6 +735,11 @@
                                         "type": "string",
                                         "example": "Gucci Shirt"
                                     },
+                                    "image": {
+                                        "title": "image",
+                                        "type": "string",
+                                        "example": "https://res.cloudinary.com/mykb/image/upload/v1643027274/e-com-app/images/products/default/no-image.png"
+                                    },
                                     "product_price": {
                                         "title": "product_price",
                                         "type": "integer",
@@ -740,6 +747,11 @@
                                     },
                                     "quantity": {
                                         "title": "quantity",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "user_id": {
+                                        "title": "user_id",
                                         "type": "integer",
                                         "example": 1
                                     }
@@ -938,7 +950,7 @@
             },
             "post": {
                 "tags": [
-                    "Product"
+                    "Agent"
                 ],
                 "summary": "Create a new product",
                 "operationId": "f59585f94ec2b5c87347e9ea2c161c11",
@@ -1081,7 +1093,7 @@
             },
             "put": {
                 "tags": [
-                    "Product"
+                    "Agent"
                 ],
                 "summary": "Update product",
                 "operationId": "b4b3845dc758045799715847f7c56325",
@@ -1189,7 +1201,7 @@
             },
             "delete": {
                 "tags": [
-                    "Product"
+                    "Agent"
                 ],
                 "summary": "Delete a product",
                 "description": "Remove the specified resource from storage.",
@@ -1426,6 +1438,11 @@
                         "title": "product_id",
                         "type": "integer",
                         "default": "1"
+                    },
+                    "image": {
+                        "title": "image",
+                        "type": "string",
+                        "default": "https://res.cloudinary.com/mykb/image/upload/v1643027274/e-com-app/images/products/default/no-image.png"
                     },
                     "quantity": {
                         "title": "quantity",

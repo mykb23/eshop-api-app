@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use Illuminate\Database\Seeder;
 
-class CreateToursTableSeeder extends Seeder
+class ProductSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +14,6 @@ class CreateToursTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        Product::factory()->count(10)->create();
     }
 }

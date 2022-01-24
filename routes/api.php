@@ -37,20 +37,21 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('login', [Auth\AuthController::class, 'login'])->name('login');
 
 
+
     Route::middleware(['auth:sanctum'])->group(function () {
+        Route::prefix('cart')->group(function () {
+            Route::get('/', [CartController::class, 'index'])->name('cart.index');
+            Route::post('/add', [CartController::class, 'store'])->name('cart.store');
+            Route::patch('update/{id}', [CartController::class, 'update'])->name('cart.update');
+            Route::delete('remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
+            Route::delete('clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
+        });
         Route::prefix('agent')->group(function () {
             Route::post('product/', [ProductController::class, 'store'])->name('product.create');
             Route::put('product/{id}', [ProductController::class, 'update'])->name('product.update');
             Route::delete('product/{id}', [ProductController::class, 'destroy'])->name('product.delete');
         });
 
-        Route::prefix('cart')->group(function () {
-            Route::get('/', [CartController::class, 'index'])->name('cart.index');
-            Route::post('/', [CartController::class, 'store'])->name('cart.store');
-            Route::patch('update/{id}', [CartController::class, 'update'])->name('cart.update');
-            Route::delete('remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
-            Route::delete('clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
-        });
 
         Route::post('password-change', [Auth\PasswordResetController::class, 'resetPassword']);
         Route::get('profile', [UserController::class, 'profile'])->name('profile');
