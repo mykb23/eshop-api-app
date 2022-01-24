@@ -13,7 +13,7 @@ use Illuminate\Routing\Controller as BaseController;
  *    title="E-Commerce API Documentation",
  *    description="API support for a E-Commerce",
  *    @OA\Contact(
- *        email="makinsuroju@gmail.com"
+ *        email=""
  *    ),
  *    @OA\License(
  *        name="Apache License 2.0",
@@ -24,14 +24,14 @@ use Illuminate\Routing\Controller as BaseController;
 
 
 /**
-  * @OA\SecurityScheme(
-  *     scheme="Bearer",
-  *     securityScheme="Bearer",
-  *     type="apiKey",
-  *     in="header",
-  *     name="Authorization",
-  * )
-  */
+ * @OA\SecurityScheme(
+ *     scheme="Bearer",
+ *     securityScheme="Bearer",
+ *     type="apiKey",
+ *     in="header",
+ *     name="Authorization",
+ * )
+ */
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
