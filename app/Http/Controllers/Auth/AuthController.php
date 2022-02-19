@@ -91,10 +91,11 @@ class AuthController extends Controller
 
         // save user details
         // $user_role = $request->input('role') ?  Role::where("name", $request->input('role'))->get() : Role::where("name", 'Customer')->get();
-
+        $user_role = $request->input('role');
         $user->save();
 
-        $user->roles()->sync($request->input('role'));
+        $user->roles()->sync($user_role);
+        // dd($user_role);
 
         // send notification
         $user->notify(new SignupActivate($user));
